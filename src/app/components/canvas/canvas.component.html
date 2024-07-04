@@ -1,0 +1,23 @@
+<div class="flex flex-col items-center space-y-4">
+  <div class="w-full md:w-auto mb-4">
+    <app-palette (colorSelected)="changeColor($event)"></app-palette>
+  </div>
+  <div class="flex justify-center items-center space-x-4">
+    <button class="btn btn-sm bg-blue-500 text-white px-4 py-1 hover:bg-blue-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            (click)="undoCanvas()">
+        <i class="fa fa-undo"></i> 
+    </button>
+    <button class="btn btn-sm bg-green-500 text-white px-4 py-1 hover:bg-green-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            (click)="redoCanvas()">
+        <i class="fa fa-repeat"></i>
+    </button>
+    <button class="btn btn-sm bg-red-500 text-white px-4 py-1 hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            (click)="clearCanvas()">
+        <i class="fa fa-eraser"></i>
+    </button>
+</div>
+
+
+
+  <canvas #canvas width="800" height="600" class="border-2 border-black"></canvas>
+</div>
