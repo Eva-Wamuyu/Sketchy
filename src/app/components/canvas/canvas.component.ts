@@ -120,7 +120,7 @@ export class CanvasComponent implements OnInit {
 
   downloadCanvas() {
     const BACKGROUND_COLOR: string = '#FFFFFF';
-    
+
     const canvas = this.canvas.nativeElement;
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d')!;
@@ -138,6 +138,25 @@ export class CanvasComponent implements OnInit {
     link.click();
 
   }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === 'z') {
+      console.log('undo');
+      this.undoCanvas();
+      event.preventDefault();
+    } else if ((event.ctrlKey && event.key.toLowerCase() === 'y') || (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'z')) {
+      console.log('redo');
+      this.redoCanvas();
+      event.preventDefault();
+    } else if (event.key === 'Delete' || event.key === 'Backspace') {
+      this.clearCanvas();
+      event.preventDefault();
+    }
+
+
+}
+
 
 
 
