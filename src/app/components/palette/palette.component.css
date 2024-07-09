@@ -1,0 +1,11 @@
+.color-palette {
+  display: flex;
+  margin: 10px 0;
+}
+
+.color {
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+  cursor: pointer;
+}

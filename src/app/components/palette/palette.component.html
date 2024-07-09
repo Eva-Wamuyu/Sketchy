@@ -1,0 +1,13 @@
+<div class="flex flex-wrap justify-center items-center">
+  <div
+    class="w-6 h-6 m-2 shadow-md cursor-pointer transition duration-300 hover:scale-105 transform-gpu"
+    *ngFor="let color of colors"
+    [style.background]="color"
+    [class.border-4]="selectedColor === color"
+    (click)="selectColor(undefined,color)"
+  ></div>
+</div>
+<div class="mt-4 flex justify-center items-center">
+  <label for="color-picker" class="mr-2 text-gray-600 text-sm">Pick a color:</label>
+  <input id="color-picker" type="color" (input)="selectColor($event)" class="w-10 h-10 cursor-pointer">
+</div>
