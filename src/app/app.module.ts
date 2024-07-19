@@ -4,12 +4,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { PaletteComponent } from './components/palette/palette.component';
+import { SelectShapeComponent } from './components/select-shape/select-shape.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CanvasComponent,
-    PaletteComponent
+    PaletteComponent,
+    SelectShapeComponent
   ],
   imports: [
     BrowserModule
