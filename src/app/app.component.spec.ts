@@ -1,27 +1,19 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+// Import necessary functions and components
+import { mount } from 'cypress/angular';
+import { AppComponent } from '../../src/app/app.component';
+import { CanvasComponent } from './components/canvas/canvas.component';
+import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 
 describe('AppComponent', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    declarations: [AppComponent]
-  }));
-
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  beforeEach(() => {
+    mount(AppComponent, {
+      declarations: [CanvasComponent],
+      imports: [BrowserModule, CommonModule],
+    });
   });
 
-  it(`should have as title 'pixel'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('pixel');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('pixel app is running!');
+  it('should render the app-canvas component', () => {
+    cy.get('app-canvas').should('exist').and('be.visible');
   });
 });
