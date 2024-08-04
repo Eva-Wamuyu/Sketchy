@@ -23,8 +23,10 @@ export class PaletteComponent {
     '#FF1493',
   ];
 
-  selectedColor: string = '';
+  selectedColor: string = '#000000';
   @Output() colorSelected = new EventEmitter<string>();
+
+  @Output() backgroundColorSelected = new EventEmitter<string>();
 
   selectColor(event?: Event,color?:string) {
     if(color) this.colorSelected.emit(color);
@@ -33,5 +35,9 @@ export class PaletteComponent {
     this.colorSelected.emit(color);
     }
     this.selectedColor = color ?? '';
+  }
+
+  selectBackgroundColor(color: string) {
+    this.backgroundColorSelected.emit(color);
   }
 }
