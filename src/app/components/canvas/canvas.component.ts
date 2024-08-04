@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef,OnInit, ViewChild, Renderer2, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-canvas',
@@ -7,7 +7,8 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular
 })
 export class CanvasComponent implements OnInit {
 
-  @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: true })
+  canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   private drawing: boolean = false;
   private selectedShape: string = 'freehand';
@@ -19,8 +20,11 @@ export class CanvasComponent implements OnInit {
 
   private backgroundColor: string = '#ffffff';
 
+  constructor(private renderer: Renderer2) {}
+
   ngOnInit() {
     this.initializeCanvas();
+    this.addCanvasEventListeners();
   }
 
   private initializeCanvas(){
@@ -28,6 +32,7 @@ export class CanvasComponent implements OnInit {
     const context = canvas.getContext('2d');
     if (context) {
       this.ctx = context;
+      this.ctx.lineWidth = 5;
     } else {
       throw new Error('Unable to get 2D context');
     }
@@ -41,14 +46,27 @@ export class CanvasComponent implements OnInit {
       x = event.clientX - rect.left;
       y = event.clientY - rect.top;
     } else {
-      const touch = event.touches[0];
+      const touch = event.changedTouches[0];
       x = touch.clientX - rect.left;
       y = touch.clientY - rect.top;
     }
     return { x, y };
   }
 
-  @HostListener('mousedown', ['$event'])
+  private addCanvasEventListeners() {
+    const canvas = this.canvas.nativeElement;
+
+    this.renderer.listen(canvas, 'mousedown', this.onMouseDown.bind(this));
+    this.renderer.listen(canvas, 'mousemove', this.onMouseMove.bind(this));
+    this.renderer.listen(canvas, 'mouseup', this.onMouseUp.bind(this));
+    this.renderer.listen(canvas, 'mouseleave', this.onMouseUp.bind(this));
+
+    this.renderer.listen(canvas, 'touchstart', this.onTouchStart.bind(this));
+    this.renderer.listen(canvas, 'touchmove', this.onTouchMove.bind(this));
+    this.renderer.listen(canvas, 'touchend', this.onTouchEnd.bind(this));
+    this.renderer.listen(canvas, 'touchcancel', this.onTouchEnd.bind(this));
+  }
+
   onMouseDown(event: MouseEvent) {
     const { x, y } = this.getCanvasCoordinates(event);
     this.startX = x;
@@ -60,7 +78,6 @@ export class CanvasComponent implements OnInit {
     }
   }
 
-  @HostListener('mousemove', ['$event'])
   onMouseMove(event: MouseEvent) {
     if (this.drawing) {
       const { x, y } = this.getCanvasCoordinates(event);
@@ -74,20 +91,16 @@ export class CanvasComponent implements OnInit {
     }
   }
 
-  @HostListener('mouseup')
-  @HostListener('mouseleave')
-  onMouseUp() {
+  onMouseUp(event: MouseEvent) {
     if (this.drawing) {
-      const { x, y } = this.getCanvasCoordinates(event as MouseEvent);
+      const { x, y } = this.getCanvasCoordinates(event);
       if (this.selectedShape !== 'freehand') {
         this.drawShape(this.startX, this.startY, x, y);
       }
       this.stopDrawing();
-      this.saveState();
     }
   }
 
-  @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
     event.preventDefault();
     const { x, y } = this.getCanvasCoordinates(event);
@@ -100,7 +113,6 @@ export class CanvasComponent implements OnInit {
     }
   }
 
-  @HostListener('touchmove', ['$event'])
   onTouchMove(event: TouchEvent) {
     event.preventDefault();
     if (this.drawing) {
@@ -115,16 +127,13 @@ export class CanvasComponent implements OnInit {
     }
   }
 
-  @HostListener('touchend')
-  @HostListener('touchcancel')
-  onTouchEnd() {
+  onTouchEnd(event: TouchEvent) {
     if (this.drawing) {
-      const { x, y } = this.getCanvasCoordinates(event as TouchEvent);
+      const { x, y } = this.getCanvasCoordinates(event);
       if (this.selectedShape !== 'freehand') {
         this.drawShape(this.startX, this.startY, x, y);
       }
       this.stopDrawing();
-      this.saveState();
     }
   }
 
@@ -146,6 +155,7 @@ export class CanvasComponent implements OnInit {
         break;
     }
     this.ctx.stroke();
+    this.ctx.closePath();
   }
 
   private stopDrawing() {
@@ -153,6 +163,7 @@ export class CanvasComponent implements OnInit {
     if (this.selectedShape === 'freehand') {
       this.ctx.closePath();
     }
+    this.saveState();
   }
 
   private redraw() {
@@ -191,7 +202,6 @@ export class CanvasComponent implements OnInit {
   private saveState() {
     const canvas = this.canvas.nativeElement;
     this.undoStack.push(canvas.toDataURL());
-    console.log('State saved:', this.undoStack);
     if (this.undoStack.length > 10) {
       this.undoStack.shift();
     }
@@ -201,18 +211,14 @@ export class CanvasComponent implements OnInit {
   undoCanvas() {
     if (this.undoStack.length > 1) {
       this.redoStack.push(this.undoStack.pop()!);
-      console.log('Undo:', this.undoStack);
-      console.log('Redo:', this.redoStack);
       this.restoreCanvas(this.undoStack[this.undoStack.length - 1]);
     }
   }
 
-  redoCanvas(){
+  redoCanvas() {
     if (this.redoStack.length > 0) {
       const img = this.redoStack.pop()!;
       this.undoStack.push(img);
-      console.log('Redo:', this.undoStack);
-      console.log('Undo:', this.redoStack);
       this.restoreCanvas(img);
     }
   }
