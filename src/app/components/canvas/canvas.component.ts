@@ -153,6 +153,12 @@ export class CanvasComponent implements OnInit {
         const radius = Math.sqrt(Math.pow((endX - startX), 2) + Math.pow((endY - startY), 2));
         this.ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
         break;
+      case 'triangle':
+        this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(endX,endY);
+        this.ctx.lineTo(2 * startX-endX,  endY);
+        this.ctx.closePath();
+        break;
     }
     this.ctx.stroke();
     this.ctx.closePath();
