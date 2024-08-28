@@ -1,0 +1,29 @@
+<div class="flex flex-row space-x-4 lg:flex-col lg:space-x-0 lg:space-y-4">
+
+  <button title="undo"
+    class="btn btn-sm bg-blue-500 text-white px-4 py-1 hover:bg-blue-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+    (click)="undoCanvas()"
+  >
+    <i class="fa fa-undo"></i>
+  </button>
+  <button title="redo"
+    class="btn btn-sm bg-green-500 text-white px-4 py-1 hover:bg-green-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+    (click)="redoCanvas()"
+  >
+    <i class="fa fa-repeat"></i>
+  </button>
+  <button title="clear"
+    class="btn btn-sm bg-red-500 text-white px-4 py-1 hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+    (click)="clearCanvas()"
+  >
+    <i class="fa fa-trash"></i>
+  </button>
+  <button title="download"
+    class="btn btn-sm bg-slate-800 text-white px-4 py-1 hover:bg-slate-950 transition duration-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
+    (click)="downloadCanvas()"
+  >
+    <i class="fa fa-download"></i>
+  </button>
+
+
+</div>
