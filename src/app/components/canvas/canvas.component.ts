@@ -1,9 +1,10 @@
 import { Component, ElementRef,OnInit, ViewChild, Renderer2, HostListener } from '@angular/core';
 
 @Component({
-  selector: 'app-canvas',
-  templateUrl: './canvas.component.html',
-  styleUrls: ['./canvas.component.css']
+    selector: 'app-canvas',
+    templateUrl: './canvas.component.html',
+    styleUrls: ['./canvas.component.css'],
+    standalone: false
 })
 export class CanvasComponent implements OnInit {
 

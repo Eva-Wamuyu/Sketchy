@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-actions',
-  templateUrl: './actions.component.html',
-  styleUrls: ['./actions.component.css']
+    selector: 'app-actions',
+    templateUrl: './actions.component.html',
+    styleUrls: ['./actions.component.css'],
+    standalone: false
 })
 export class ActionsComponent {
   @Output() undo = new EventEmitter<void>();
