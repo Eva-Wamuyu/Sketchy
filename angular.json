@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "pixel:build:production"
+              "buildTarget": "pixel:build:production"
             },
             "development": {
-              "browserTarget": "pixel:build:development"
+              "buildTarget": "pixel:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -71,7 +71,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "pixel:build"
+            "buildTarget": "pixel:build"
           }
         },
         "test": {
@@ -91,5 +91,8 @@
       }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
