@@ -1,6 +1,7 @@
 canvas {
   border: 1px solid #000;
   cursor: url('../../../assets/svgs/shapes.svg') 12 12, auto;
+  touch-action: none;
 }
 #canva .width{
   width: 400px;

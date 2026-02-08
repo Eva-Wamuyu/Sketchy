@@ -1,4 +1,5 @@
 import { Component, ElementRef,OnInit, ViewChild, Renderer2, HostListener } from '@angular/core';
+import { CanvasShape } from 'src/app/models/shape-enum';
 
 @Component({
     selector: 'app-canvas',
@@ -12,9 +13,11 @@ export class CanvasComponent implements OnInit {
   canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   private drawing: boolean = false;
-  private selectedShape: string = 'freehand';
+  private selectedShape: CanvasShape = CanvasShape.Freehand;
   private startX: number = 0;
   private startY: number = 0;
+
+  private baseSnapshot: ImageData | null = null;
 
   private undoStack: string[] = [];
   private redoStack: string[] = [];
@@ -68,93 +71,167 @@ export class CanvasComponent implements OnInit {
     this.renderer.listen(canvas, 'touchcancel', this.onTouchEnd.bind(this));
   }
 
-  onMouseDown(event: MouseEvent) {
-    const { x, y } = this.getCanvasCoordinates(event);
+  private startDrawingAt(x: number, y: number) {
     this.startX = x;
     this.startY = y;
     this.drawing = true;
-    if (this.selectedShape === 'freehand') {
+    if (this.selectedShape === CanvasShape.Freehand) {
       this.ctx.beginPath();
       this.ctx.moveTo(x, y);
     }
+    else{
+      const canvas = this.canvas.nativeElement;
+      this.baseSnapshot = this.ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  private moveDrawingTo(x: number, y: number) {
+    if (!this.drawing) return;
+    if (this.selectedShape === CanvasShape.Freehand) {
+      this.ctx.lineTo(x, y);
+      this.ctx.stroke();
+      return;
+    } 
+    if (this.baseSnapshot) {
+      this.ctx.putImageData(this.baseSnapshot, 0, 0);
+    }
+    this.drawShape(this.startX, this.startY, x, y);
+  }
+
+  private endDrawingAt(x: number, y: number) {
+    if (!this.drawing) return;
+    
+    if (this.selectedShape !== CanvasShape.Freehand) {
+      if (this.baseSnapshot) {
+        this.ctx.putImageData(this.baseSnapshot, 0, 0);
+        this.drawShape(this.startX, this.startY, x, y);
+        this.baseSnapshot = null;
+      }
+    }
+    else{
+      this.ctx.closePath();
+    }
+
+    this.drawing = false;
+    this.saveState();
+  }
+
+  private cancelDrawing() {
+    if (!this.drawing) return;
+    if (this.selectedShape !== CanvasShape.Freehand && this.baseSnapshot) {
+      this.ctx.putImageData(this.baseSnapshot, 0, 0);
+      this.baseSnapshot = null;
+    } else if (this.selectedShape === CanvasShape.Freehand) {
+      this.ctx.closePath();
+    }
+    this.drawing = false;
+    this.saveState();
+  }
+
+  onMouseDown(event: MouseEvent) {
+    const { x, y } = this.getCanvasCoordinates(event);
+    // this.startX = x;
+    // this.startY = y;
+    // this.drawing = true;
+    // if (this.selectedShape === CanvasShape.Freehand) {
+    //   this.ctx.beginPath();
+    //   this.ctx.moveTo(x, y);
+    // }
+    this.startDrawingAt(x, y);
   }
 
   onMouseMove(event: MouseEvent) {
-    if (this.drawing) {
-      const { x, y } = this.getCanvasCoordinates(event);
-      if (this.selectedShape === 'freehand') {
-        this.ctx.lineTo(x, y);
-        this.ctx.stroke();
-      } else {
-        this.redraw();
-        this.drawShape(this.startX, this.startY, x, y);
-      }
-    }
+    // if (this.drawing) {
+    //   const { x, y } = this.getCanvasCoordinates(event);
+    //   if (this.selectedShape === CanvasShape.Freehand) {
+    //     this.ctx.lineTo(x, y);
+    //     this.ctx.stroke();
+    //   } else {
+    //     this.redraw();
+    //     this.drawShape(this.startX, this.startY, x, y);
+    //   }
+    // }
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.moveDrawingTo(x, y);
   }
 
   onMouseUp(event: MouseEvent) {
-    if (this.drawing) {
-      const { x, y } = this.getCanvasCoordinates(event);
-      if (this.selectedShape !== 'freehand') {
-        this.drawShape(this.startX, this.startY, x, y);
-      }
-      this.stopDrawing();
-    }
+    // if (this.drawing) {
+    //   const { x, y } = this.getCanvasCoordinates(event);
+    //   if (this.selectedShape !== CanvasShape.Freehand) {
+    //     this.drawShape(this.startX, this.startY, x, y);
+    //   }
+    //   this.stopDrawing();
+    // }
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.endDrawingAt(x, y);
+  }
+
+  onMouseLeave() {
+    this.cancelDrawing();
   }
 
   onTouchStart(event: TouchEvent) {
     event.preventDefault();
     const { x, y } = this.getCanvasCoordinates(event);
-    this.startX = x;
-    this.startY = y;
-    this.drawing = true;
-    if (this.selectedShape === 'freehand') {
-      this.ctx.beginPath();
-      this.ctx.moveTo(x, y);
-    }
+    // this.startX = x;
+    // this.startY = y;
+    // this.drawing = true;
+    // if (this.selectedShape === CanvasShape.Freehand) {
+    //   this.ctx.beginPath();
+    //   this.ctx.moveTo(x, y);
+    // }
+    this.startDrawingAt(x, y);
   }
 
   onTouchMove(event: TouchEvent) {
     event.preventDefault();
-    if (this.drawing) {
-      const { x, y } = this.getCanvasCoordinates(event);
-      if (this.selectedShape === 'freehand') {
-        this.ctx.lineTo(x, y);
-        this.ctx.stroke();
-      } else {
-        this.redraw();
-        this.drawShape(this.startX, this.startY, x, y);
-      }
-    }
+    // if (this.drawing) {
+    //   const { x, y } = this.getCanvasCoordinates(event);
+    //   if (this.selectedShape === CanvasShape.Freehand) {
+    //     this.ctx.lineTo(x, y);
+    //     this.ctx.stroke();
+    //   } else {
+    //     this.redraw();
+    //     this.drawShape(this.startX, this.startY, x, y);
+    //   }
+    // }
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.moveDrawingTo(x, y);
   }
 
   onTouchEnd(event: TouchEvent) {
-    if (this.drawing) {
-      const { x, y } = this.getCanvasCoordinates(event);
-      if (this.selectedShape !== 'freehand') {
-        this.drawShape(this.startX, this.startY, x, y);
-      }
-      this.stopDrawing();
-    }
+    // if (this.drawing) {
+    //   const { x, y } = this.getCanvasCoordinates(event);
+    //   if (this.selectedShape !== CanvasShape.Freehand) {
+    //     this.drawShape(this.startX, this.startY, x, y);
+    //   }
+    //   this.stopDrawing();
+    // }
+    const { x, y } = this.getCanvasCoordinates(event);
+    this.endDrawingAt(x, y);
+  }
+  onTouchCancel() {
+    this.cancelDrawing();
   }
 
   private drawShape(startX: number, startY: number, endX: number, endY: number) {
     this.ctx.beginPath();
     switch (this.selectedShape) {
-      case 'line':
+      case CanvasShape.Line:
         this.ctx.moveTo(startX, startY);
         this.ctx.lineTo(endX, endY);
         break;
-      case 'rectangle':
+      case CanvasShape.Rectangle:
         const width = endX - startX;
         const height = endY - startY;
         this.ctx.rect(startX, startY, width, height);
         break;
-      case 'circle':
+      case CanvasShape.Circle:
         const radius = Math.sqrt(Math.pow((endX - startX), 2) + Math.pow((endY - startY), 2));
         this.ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
         break;
-      case 'triangle':
+      case CanvasShape.Triangle:
         this.ctx.moveTo(startX, startY);
         this.ctx.lineTo(endX,endY);
         this.ctx.lineTo(2 * startX-endX,  endY);
@@ -165,28 +242,7 @@ export class CanvasComponent implements OnInit {
     this.ctx.closePath();
   }
 
-  private stopDrawing() {
-    this.drawing = false;
-    if (this.selectedShape === 'freehand') {
-      this.ctx.closePath();
-    }
-    this.saveState();
-  }
-
-  private redraw() {
-    const canvas = this.canvas.nativeElement;
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const img = new Image();
-    const [lastState] = this.undoStack.slice(-1);
-    if (lastState) {
-      img.src = lastState;
-      img.onload = () => {
-        this.ctx.drawImage(img, 0, 0);
-      };
-    }
-  }
-
-  onShapeSelected(shape: string) {
+  onShapeSelected(shape: CanvasShape) {
     this.selectedShape = shape;
   }
 

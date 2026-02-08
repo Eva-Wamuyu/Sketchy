@@ -1,17 +1,17 @@
 <div class="flex flex-row md:flex-col justify-center items-center space-x-4 md:space-x-0 md:space-y-4">
-  <button class="btn btn-sm py-2 px-1" [ngClass]="{'border-2': selectedShape === 'line'}" (click)="selectShape('line')">
+  <button class="btn btn-sm py-2 px-1" [ngClass]="{'border-2': selectedShape === CanvasShape.Line}" (click)="selectShape(CanvasShape.Line)">
     <i class="fa fa-minus"></i>
   </button>
-  <button class="btn  btn-sm p-2" [ngClass]="{'border-2': selectedShape === 'rectangle'}" (click)="selectShape('rectangle')">
+  <button class="btn  btn-sm p-2" [ngClass]="{'border-2': selectedShape === CanvasShape.Rectangle}" (click)="selectShape(CanvasShape.Rectangle)">
     <i class="fa fa-square"></i>
   </button>
-  <button class="btn  btn-sm p-2" [ngClass]="{'border-2': selectedShape === 'circle'}" (click)="selectShape('circle')">
+  <button class="btn  btn-sm p-2" [ngClass]="{'border-2': selectedShape === CanvasShape.Circle}" (click)="selectShape(CanvasShape.Circle)">
     <i class="fa-regular fa fa-circle"></i>
   </button>
-  <button class="btn btn-sm p-2" [ngClass]="{'border-2': selectedShape === 'triangle'}" (click)="selectShape('triangle')">
+  <button class="btn btn-sm p-2" [ngClass]="{'border-2': selectedShape === CanvasShape.Triangle}" (click)="selectShape(CanvasShape.Triangle)">
     <i class="triangle-icon"></i>
   </button>
-  <button class="btn btn-sm p-2" [ngClass]="{'border-2': selectedShape === 'freehand'}" (click)="selectShape('freehand')">
+  <button class="btn btn-sm p-2" [ngClass]="{'border-2': selectedShape === CanvasShape.Freehand}" (click)="selectShape(CanvasShape.Freehand)">
     <i class="fa-regular fa fa-pencil"></i>
   </button>
 </div>
